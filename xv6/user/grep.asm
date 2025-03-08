@@ -5,12 +5,6 @@ user/_grep:     file format elf64-littleriscv
 Disassembly of section .text:
 
 0000000000000000 <matchstar>:
-  return 0;
-}
-
-// matchstar: search for c*re at beginning of text
-int matchstar(int c, char *re, char *text)
-{
    0:	7179                	addi	sp,sp,-48
    2:	f406                	sd	ra,40(sp)
    4:	f022                	sd	s0,32(sp)
@@ -22,17 +16,11 @@ int matchstar(int c, char *re, char *text)
   10:	892a                	mv	s2,a0
   12:	89ae                	mv	s3,a1
   14:	84b2                	mv	s1,a2
-  do{  // a * matches zero or more instances
-    if(matchhere(re, text))
-      return 1;
-  }while(*text!='\0' && (*text++==c || c=='.'));
   16:	02e00a13          	li	s4,46
-    if(matchhere(re, text))
   1a:	85a6                	mv	a1,s1
   1c:	854e                	mv	a0,s3
   1e:	02c000ef          	jal	4a <matchhere>
   22:	e919                	bnez	a0,38 <matchstar+0x38>
-  }while(*text!='\0' && (*text++==c || c=='.'));
   24:	0004c783          	lbu	a5,0(s1)
   28:	cb89                	beqz	a5,3a <matchstar+0x3a>
   2a:	0485                	addi	s1,s1,1
@@ -40,10 +28,7 @@ int matchstar(int c, char *re, char *text)
   2e:	ff2786e3          	beq	a5,s2,1a <matchstar+0x1a>
   32:	ff4904e3          	beq	s2,s4,1a <matchstar+0x1a>
   36:	a011                	j	3a <matchstar+0x3a>
-      return 1;
   38:	4505                	li	a0,1
-  return 0;
-}
   3a:	70a2                	ld	ra,40(sp)
   3c:	7402                	ld	s0,32(sp)
   3e:	64e2                	ld	s1,24(sp)
@@ -54,69 +39,50 @@ int matchstar(int c, char *re, char *text)
   48:	8082                	ret
 
 000000000000004a <matchhere>:
-  if(re[0] == '\0')
   4a:	00054703          	lbu	a4,0(a0)
   4e:	c73d                	beqz	a4,bc <matchhere+0x72>
-{
   50:	1141                	addi	sp,sp,-16
   52:	e406                	sd	ra,8(sp)
   54:	e022                	sd	s0,0(sp)
   56:	0800                	addi	s0,sp,16
   58:	87aa                	mv	a5,a0
-  if(re[1] == '*')
   5a:	00154683          	lbu	a3,1(a0)
   5e:	02a00613          	li	a2,42
   62:	02c68563          	beq	a3,a2,8c <matchhere+0x42>
-  if(re[0] == '$' && re[1] == '\0')
   66:	02400613          	li	a2,36
   6a:	02c70863          	beq	a4,a2,9a <matchhere+0x50>
-  if(*text!='\0' && (re[0]=='.' || re[0]==*text))
   6e:	0005c683          	lbu	a3,0(a1)
-  return 0;
   72:	4501                	li	a0,0
-  if(*text!='\0' && (re[0]=='.' || re[0]==*text))
   74:	ca81                	beqz	a3,84 <matchhere+0x3a>
   76:	02e00613          	li	a2,46
   7a:	02c70b63          	beq	a4,a2,b0 <matchhere+0x66>
-  return 0;
   7e:	4501                	li	a0,0
-  if(*text!='\0' && (re[0]=='.' || re[0]==*text))
   80:	02d70863          	beq	a4,a3,b0 <matchhere+0x66>
-}
   84:	60a2                	ld	ra,8(sp)
   86:	6402                	ld	s0,0(sp)
   88:	0141                	addi	sp,sp,16
   8a:	8082                	ret
-    return matchstar(re[0], re+2, text);
   8c:	862e                	mv	a2,a1
   8e:	00250593          	addi	a1,a0,2
   92:	853a                	mv	a0,a4
   94:	f6dff0ef          	jal	0 <matchstar>
   98:	b7f5                	j	84 <matchhere+0x3a>
-  if(re[0] == '$' && re[1] == '\0')
   9a:	c691                	beqz	a3,a6 <matchhere+0x5c>
-  if(*text!='\0' && (re[0]=='.' || re[0]==*text))
   9c:	0005c683          	lbu	a3,0(a1)
   a0:	fef9                	bnez	a3,7e <matchhere+0x34>
-  return 0;
   a2:	4501                	li	a0,0
   a4:	b7c5                	j	84 <matchhere+0x3a>
-    return *text == '\0';
   a6:	0005c503          	lbu	a0,0(a1)
   aa:	00153513          	seqz	a0,a0
   ae:	bfd9                	j	84 <matchhere+0x3a>
-    return matchhere(re+1, text+1);
   b0:	0585                	addi	a1,a1,1
   b2:	00178513          	addi	a0,a5,1
   b6:	f95ff0ef          	jal	4a <matchhere>
   ba:	b7e9                	j	84 <matchhere+0x3a>
-    return 1;
   bc:	4505                	li	a0,1
-}
   be:	8082                	ret
 
 00000000000000c0 <match>:
-{
   c0:	1101                	addi	sp,sp,-32
   c2:	ec06                	sd	ra,24(sp)
   c4:	e822                	sd	s0,16(sp)
@@ -125,27 +91,21 @@ int matchstar(int c, char *re, char *text)
   ca:	1000                	addi	s0,sp,32
   cc:	892a                	mv	s2,a0
   ce:	84ae                	mv	s1,a1
-  if(re[0] == '^')
   d0:	00054703          	lbu	a4,0(a0)
   d4:	05e00793          	li	a5,94
   d8:	00f70c63          	beq	a4,a5,f0 <match+0x30>
-    if(matchhere(re, text))
   dc:	85a6                	mv	a1,s1
   de:	854a                	mv	a0,s2
   e0:	f6bff0ef          	jal	4a <matchhere>
   e4:	e911                	bnez	a0,f8 <match+0x38>
-  }while(*text++ != '\0');
   e6:	0485                	addi	s1,s1,1
   e8:	fff4c783          	lbu	a5,-1(s1)
   ec:	fbe5                	bnez	a5,dc <match+0x1c>
   ee:	a031                	j	fa <match+0x3a>
-    return matchhere(re+1, text);
   f0:	0505                	addi	a0,a0,1
   f2:	f59ff0ef          	jal	4a <matchhere>
   f6:	a011                	j	fa <match+0x3a>
-      return 1;
   f8:	4505                	li	a0,1
-}
   fa:	60e2                	ld	ra,24(sp)
   fc:	6442                	ld	s0,16(sp)
   fe:	64a2                	ld	s1,8(sp)
@@ -154,7 +114,6 @@ int matchstar(int c, char *re, char *text)
  104:	8082                	ret
 
 0000000000000106 <grep>:
-{
  106:	715d                	addi	sp,sp,-80
  108:	e486                	sd	ra,72(sp)
  10a:	e0a2                	sd	s0,64(sp)
@@ -169,67 +128,50 @@ int matchstar(int c, char *re, char *text)
  11c:	0880                	addi	s0,sp,80
  11e:	89aa                	mv	s3,a0
  120:	8b2e                	mv	s6,a1
-  m = 0;
  122:	4a01                	li	s4,0
-  while((n = read(fd, buf+m, sizeof(buf)-m-1)) > 0){
  124:	3ff00b93          	li	s7,1023
  128:	00001a97          	auipc	s5,0x1
  12c:	ee8a8a93          	addi	s5,s5,-280 # 1010 <buf>
  130:	a835                	j	16c <grep+0x66>
-      p = q+1;
  132:	00148913          	addi	s2,s1,1
-    while((q = strchr(p, '\n')) != 0){
  136:	45a9                	li	a1,10
  138:	854a                	mv	a0,s2
  13a:	1c6000ef          	jal	300 <strchr>
  13e:	84aa                	mv	s1,a0
  140:	c505                	beqz	a0,168 <grep+0x62>
-      *q = 0;
  142:	00048023          	sb	zero,0(s1)
-      if(match(pattern, p)){
  146:	85ca                	mv	a1,s2
  148:	854e                	mv	a0,s3
  14a:	f77ff0ef          	jal	c0 <match>
  14e:	d175                	beqz	a0,132 <grep+0x2c>
-        *q = '\n';
  150:	47a9                	li	a5,10
  152:	00f48023          	sb	a5,0(s1)
-        write(1, p, q+1 - p);
  156:	00148613          	addi	a2,s1,1
  15a:	4126063b          	subw	a2,a2,s2
  15e:	85ca                	mv	a1,s2
  160:	4505                	li	a0,1
  162:	382000ef          	jal	4e4 <write>
  166:	b7f1                	j	132 <grep+0x2c>
-    if(m > 0){
  168:	03404563          	bgtz	s4,192 <grep+0x8c>
-  while((n = read(fd, buf+m, sizeof(buf)-m-1)) > 0){
  16c:	414b863b          	subw	a2,s7,s4
  170:	014a85b3          	add	a1,s5,s4
  174:	855a                	mv	a0,s6
  176:	366000ef          	jal	4dc <read>
  17a:	02a05963          	blez	a0,1ac <grep+0xa6>
-    m += n;
  17e:	00aa0c3b          	addw	s8,s4,a0
  182:	000c0a1b          	sext.w	s4,s8
-    buf[m] = '\0';
  186:	014a87b3          	add	a5,s5,s4
  18a:	00078023          	sb	zero,0(a5)
-    p = buf;
  18e:	8956                	mv	s2,s5
-    while((q = strchr(p, '\n')) != 0){
  190:	b75d                	j	136 <grep+0x30>
-      m -= p - buf;
  192:	00001517          	auipc	a0,0x1
  196:	e7e50513          	addi	a0,a0,-386 # 1010 <buf>
  19a:	40a90a33          	sub	s4,s2,a0
  19e:	414c0a3b          	subw	s4,s8,s4
-      memmove(buf, p, m);
  1a2:	8652                	mv	a2,s4
  1a4:	85ca                	mv	a1,s2
  1a6:	270000ef          	jal	416 <memmove>
  1aa:	b7c9                	j	16c <grep+0x66>
-}
  1ac:	60a6                	ld	ra,72(sp)
  1ae:	6406                	ld	s0,64(sp)
  1b0:	74e2                	ld	s1,56(sp)
@@ -244,7 +186,6 @@ int matchstar(int c, char *re, char *text)
  1c2:	8082                	ret
 
 00000000000001c4 <main>:
-{
  1c4:	7179                	addi	sp,sp,-48
  1c6:	f406                	sd	ra,40(sp)
  1c8:	f022                	sd	s0,32(sp)
@@ -253,12 +194,9 @@ int matchstar(int c, char *re, char *text)
  1ce:	e44e                	sd	s3,8(sp)
  1d0:	e052                	sd	s4,0(sp)
  1d2:	1800                	addi	s0,sp,48
-  if(argc <= 1){
  1d4:	4785                	li	a5,1
  1d6:	04a7d663          	bge	a5,a0,222 <main+0x5e>
-  pattern = argv[1];
  1da:	0085ba03          	ld	s4,8(a1)
-  if(argc <= 2){
  1de:	4789                	li	a5,2
  1e0:	04a7db63          	bge	a5,a0,236 <main+0x72>
  1e4:	01058913          	addi	s2,a1,16
@@ -267,46 +205,35 @@ int matchstar(int c, char *re, char *text)
  1f0:	01d7d993          	srli	s3,a5,0x1d
  1f4:	05e1                	addi	a1,a1,24
  1f6:	99ae                	add	s3,s3,a1
-    if((fd = open(argv[i], O_RDONLY)) < 0){
  1f8:	4581                	li	a1,0
  1fa:	00093503          	ld	a0,0(s2)
  1fe:	306000ef          	jal	504 <open>
  202:	84aa                	mv	s1,a0
  204:	04054063          	bltz	a0,244 <main+0x80>
-    grep(pattern, fd);
  208:	85aa                	mv	a1,a0
  20a:	8552                	mv	a0,s4
  20c:	efbff0ef          	jal	106 <grep>
-    close(fd);
  210:	8526                	mv	a0,s1
  212:	2da000ef          	jal	4ec <close>
-  for(i = 2; i < argc; i++){
  216:	0921                	addi	s2,s2,8
  218:	ff3910e3          	bne	s2,s3,1f8 <main+0x34>
-  exit(0);
  21c:	4501                	li	a0,0
  21e:	2a6000ef          	jal	4c4 <exit>
-    fprintf(2, "usage: grep pattern [file ...]\n");
  222:	00001597          	auipc	a1,0x1
  226:	86e58593          	addi	a1,a1,-1938 # a90 <malloc+0x100>
  22a:	4509                	li	a0,2
  22c:	686000ef          	jal	8b2 <fprintf>
-    exit(1);
  230:	4505                	li	a0,1
  232:	292000ef          	jal	4c4 <exit>
-    grep(pattern, 0);
  236:	4581                	li	a1,0
  238:	8552                	mv	a0,s4
  23a:	ecdff0ef          	jal	106 <grep>
-    exit(0);
  23e:	4501                	li	a0,0
  240:	284000ef          	jal	4c4 <exit>
-      printf("grep: cannot open %s\n", argv[i]);
  244:	00093583          	ld	a1,0(s2)
  248:	00001517          	auipc	a0,0x1
  24c:	86850513          	addi	a0,a0,-1944 # ab0 <malloc+0x120>
  250:	68c000ef          	jal	8dc <printf>
-      exit(1);
  254:	4505                	li	a0,1
  256:	26e000ef          	jal	4c4 <exit>
 

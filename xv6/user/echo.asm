@@ -5,12 +5,6 @@ user/_echo:     file format elf64-littleriscv
 Disassembly of section .text:
 
 0000000000000000 <main>:
-#include "kernel/stat.h"
-#include "user/user.h"
-
-int
-main(int argc, char *argv[])
-{
    0:	7139                	addi	sp,sp,-64
    2:	fc06                	sd	ra,56(sp)
    4:	f822                	sd	s0,48(sp)
@@ -20,9 +14,6 @@ main(int argc, char *argv[])
    c:	e852                	sd	s4,16(sp)
    e:	e456                	sd	s5,8(sp)
   10:	0080                	addi	s0,sp,64
-  int i;
-
-  for(i = 1; i < argc; i++){
   12:	4785                	li	a5,1
   14:	06a7d063          	bge	a5,a0,74 <main+0x74>
   18:	00858493          	addi	s1,a1,8
@@ -32,9 +23,6 @@ main(int argc, char *argv[])
   26:	00a48a33          	add	s4,s1,a0
   2a:	05c1                	addi	a1,a1,16
   2c:	00a589b3          	add	s3,a1,a0
-    write(1, argv[i], strlen(argv[i]));
-    if(i + 1 < argc){
-      write(1, " ", 1);
   30:	00001a97          	auipc	s5,0x1
   34:	880a8a93          	addi	s5,s5,-1920 # 8b0 <malloc+0x100>
   38:	a809                	j	4a <main+0x4a>
@@ -42,10 +30,8 @@ main(int argc, char *argv[])
   3c:	85d6                	mv	a1,s5
   3e:	4505                	li	a0,1
   40:	2c4000ef          	jal	304 <write>
-  for(i = 1; i < argc; i++){
   44:	04a1                	addi	s1,s1,8
   46:	03348763          	beq	s1,s3,74 <main+0x74>
-    write(1, argv[i], strlen(argv[i]));
   4a:	0004b903          	ld	s2,0(s1)
   4e:	854a                	mv	a0,s2
   50:	084000ef          	jal	d4 <strlen>
@@ -53,18 +39,12 @@ main(int argc, char *argv[])
   58:	85ca                	mv	a1,s2
   5a:	4505                	li	a0,1
   5c:	2a8000ef          	jal	304 <write>
-    if(i + 1 < argc){
   60:	fd449de3          	bne	s1,s4,3a <main+0x3a>
-    } else {
-      write(1, "\n", 1);
   64:	4605                	li	a2,1
   66:	00001597          	auipc	a1,0x1
   6a:	85258593          	addi	a1,a1,-1966 # 8b8 <malloc+0x108>
   6e:	4505                	li	a0,1
   70:	294000ef          	jal	304 <write>
-    }
-  }
-  exit(0);
   74:	4501                	li	a0,0
   76:	26e000ef          	jal	2e4 <exit>
 
