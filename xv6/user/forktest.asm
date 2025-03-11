@@ -5,25 +5,17 @@ user/_forktest:     file format elf64-littleriscv
 Disassembly of section .text:
 
 0000000000000000 <print>:
-
-#define N  1000
-
-void
-print(const char *s)
-{
    0:	1101                	addi	sp,sp,-32
    2:	ec06                	sd	ra,24(sp)
    4:	e822                	sd	s0,16(sp)
    6:	e426                	sd	s1,8(sp)
    8:	1000                	addi	s0,sp,32
    a:	84aa                	mv	s1,a0
-  write(1, s, strlen(s));
    c:	124000ef          	jal	130 <strlen>
   10:	0005061b          	sext.w	a2,a0
   14:	85a6                	mv	a1,s1
   16:	4505                	li	a0,1
   18:	348000ef          	jal	360 <write>
-}
   1c:	60e2                	ld	ra,24(sp)
   1e:	6442                	ld	s0,16(sp)
   20:	64a2                	ld	s1,8(sp)
@@ -31,92 +23,51 @@ print(const char *s)
   24:	8082                	ret
 
 0000000000000026 <forktest>:
-
-void
-forktest(void)
-{
   26:	1101                	addi	sp,sp,-32
   28:	ec06                	sd	ra,24(sp)
   2a:	e822                	sd	s0,16(sp)
   2c:	e426                	sd	s1,8(sp)
   2e:	e04a                	sd	s2,0(sp)
   30:	1000                	addi	s0,sp,32
-  int n, pid;
-
-  print("fork test\n");
   32:	00000517          	auipc	a0,0x0
   36:	3ae50513          	addi	a0,a0,942 # 3e0 <uptime+0x8>
   3a:	fc7ff0ef          	jal	0 <print>
-
-  for(n=0; n<N; n++){
   3e:	4481                	li	s1,0
   40:	3e800913          	li	s2,1000
-    pid = fork();
   44:	2f4000ef          	jal	338 <fork>
-    if(pid < 0)
   48:	04054363          	bltz	a0,8e <forktest+0x68>
-      break;
-    if(pid == 0)
   4c:	cd09                	beqz	a0,66 <forktest+0x40>
-  for(n=0; n<N; n++){
   4e:	2485                	addiw	s1,s1,1
   50:	ff249ae3          	bne	s1,s2,44 <forktest+0x1e>
-      exit(0);
-  }
-
-  if(n == N){
-    print("fork claimed to work N times!\n");
   54:	00000517          	auipc	a0,0x0
   58:	3dc50513          	addi	a0,a0,988 # 430 <uptime+0x58>
   5c:	fa5ff0ef          	jal	0 <print>
-    exit(1);
   60:	4505                	li	a0,1
   62:	2de000ef          	jal	340 <exit>
-      exit(0);
   66:	2da000ef          	jal	340 <exit>
-  }
-
-  for(; n > 0; n--){
-    if(wait(0) < 0){
-      print("wait stopped early\n");
   6a:	00000517          	auipc	a0,0x0
   6e:	38650513          	addi	a0,a0,902 # 3f0 <uptime+0x18>
   72:	f8fff0ef          	jal	0 <print>
-      exit(1);
   76:	4505                	li	a0,1
   78:	2c8000ef          	jal	340 <exit>
-    }
-  }
-
-  if(wait(0) != -1){
-    print("wait got too many\n");
   7c:	00000517          	auipc	a0,0x0
   80:	38c50513          	addi	a0,a0,908 # 408 <uptime+0x30>
   84:	f7dff0ef          	jal	0 <print>
-    exit(1);
   88:	4505                	li	a0,1
   8a:	2b6000ef          	jal	340 <exit>
-  for(; n > 0; n--){
   8e:	00905963          	blez	s1,a0 <forktest+0x7a>
-    if(wait(0) < 0){
   92:	4501                	li	a0,0
   94:	2b4000ef          	jal	348 <wait>
   98:	fc0549e3          	bltz	a0,6a <forktest+0x44>
-  for(; n > 0; n--){
   9c:	34fd                	addiw	s1,s1,-1
   9e:	f8f5                	bnez	s1,92 <forktest+0x6c>
-  if(wait(0) != -1){
   a0:	4501                	li	a0,0
   a2:	2a6000ef          	jal	348 <wait>
   a6:	57fd                	li	a5,-1
   a8:	fcf51ae3          	bne	a0,a5,7c <forktest+0x56>
-  }
-
-  print("fork test OK\n");
   ac:	00000517          	auipc	a0,0x0
   b0:	37450513          	addi	a0,a0,884 # 420 <uptime+0x48>
   b4:	f4dff0ef          	jal	0 <print>
-}
   b8:	60e2                	ld	ra,24(sp)
   ba:	6442                	ld	s0,16(sp)
   bc:	64a2                	ld	s1,8(sp)
@@ -125,17 +76,11 @@ forktest(void)
   c2:	8082                	ret
 
 00000000000000c4 <main>:
-
-int
-main(void)
-{
   c4:	1141                	addi	sp,sp,-16
   c6:	e406                	sd	ra,8(sp)
   c8:	e022                	sd	s0,0(sp)
   ca:	0800                	addi	s0,sp,16
-  forktest();
   cc:	f5bff0ef          	jal	26 <forktest>
-  exit(0);
   d0:	4501                	li	a0,0
   d2:	26e000ef          	jal	340 <exit>
 

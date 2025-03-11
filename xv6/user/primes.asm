@@ -5,34 +5,20 @@ user/_primes:     file format elf64-littleriscv
 Disassembly of section .text:
 
 0000000000000000 <sieve>:
-#include "user/user.h"
-
-void sieve(int fd) __attribute__((noreturn));
-
-void sieve(int fd)
-{
    0:	7179                	addi	sp,sp,-48
    2:	f406                	sd	ra,40(sp)
    4:	f022                	sd	s0,32(sp)
    6:	e84a                	sd	s2,16(sp)
    8:	1800                	addi	s0,sp,48
    a:	892a                	mv	s2,a0
-  int prime, r, num;
-  r = read(fd, &prime, sizeof(prime));
    c:	4611                	li	a2,4
    e:	fdc40593          	addi	a1,s0,-36
   12:	4cc000ef          	jal	4de <read>
-  if(r == 0){
   16:	c905                	beqz	a0,46 <sieve+0x46>
   18:	ec26                	sd	s1,24(sp)
   1a:	84aa                	mv	s1,a0
-    close(fd);
-    exit(0);
-  }
-  if(r != sizeof(prime)){
   1c:	4791                	li	a5,4
   1e:	02f50b63          	beq	a0,a5,54 <sieve+0x54>
-    fprintf(2, "PID %d: read error: expected %lu bytes, got %lu\n", getpid(), (unsigned long)sizeof(prime), (unsigned long)r);
   22:	524000ef          	jal	546 <getpid>
   26:	862a                	mv	a2,a0
   28:	8726                	mv	a4,s1
@@ -41,270 +27,169 @@ void sieve(int fd)
   30:	a6458593          	addi	a1,a1,-1436 # a90 <malloc+0xfe>
   34:	4509                	li	a0,2
   36:	07f000ef          	jal	8b4 <fprintf>
-    close(fd);
   3a:	854a                	mv	a0,s2
   3c:	4b2000ef          	jal	4ee <close>
-    exit(1);
   40:	4505                	li	a0,1
   42:	484000ef          	jal	4c6 <exit>
   46:	ec26                	sd	s1,24(sp)
-    close(fd);
   48:	854a                	mv	a0,s2
   4a:	4a4000ef          	jal	4ee <close>
-    exit(0);
   4e:	4501                	li	a0,0
   50:	476000ef          	jal	4c6 <exit>
-  }
-  printf("prime %d\n", prime);
   54:	fdc42583          	lw	a1,-36(s0)
   58:	00001517          	auipc	a0,0x1
   5c:	a7050513          	addi	a0,a0,-1424 # ac8 <malloc+0x136>
   60:	07f000ef          	jal	8de <printf>
-
-  int p[2];
-  if(pipe(p) < 0){
   64:	fd040513          	addi	a0,s0,-48
   68:	46e000ef          	jal	4d6 <pipe>
   6c:	02054263          	bltz	a0,90 <sieve+0x90>
-    fprintf(2, "PID %d: pipe() error\n", getpid());
-    close(fd);
-    exit(1);
-  }
-
-  int pid = fork();
   70:	44e000ef          	jal	4be <fork>
-  if(pid < 0){
   74:	02054e63          	bltz	a0,b0 <sieve+0xb0>
-    close(fd);
-    close(p[0]);
-    close(p[1]);
-    exit(1);
-  }
-  if(pid == 0){
   78:	e525                	bnez	a0,e0 <sieve+0xe0>
-    close(p[1]);
   7a:	fd442503          	lw	a0,-44(s0)
   7e:	470000ef          	jal	4ee <close>
-    close(fd);
   82:	854a                	mv	a0,s2
   84:	46a000ef          	jal	4ee <close>
-    sieve(p[0]);
   88:	fd042503          	lw	a0,-48(s0)
   8c:	f75ff0ef          	jal	0 <sieve>
-    fprintf(2, "PID %d: pipe() error\n", getpid());
   90:	4b6000ef          	jal	546 <getpid>
   94:	862a                	mv	a2,a0
   96:	00001597          	auipc	a1,0x1
   9a:	a4258593          	addi	a1,a1,-1470 # ad8 <malloc+0x146>
   9e:	4509                	li	a0,2
   a0:	015000ef          	jal	8b4 <fprintf>
-    close(fd);
   a4:	854a                	mv	a0,s2
   a6:	448000ef          	jal	4ee <close>
-    exit(1);
   aa:	4505                	li	a0,1
   ac:	41a000ef          	jal	4c6 <exit>
-    fprintf(2, "PID %d: fork() error\n", getpid());
   b0:	496000ef          	jal	546 <getpid>
   b4:	862a                	mv	a2,a0
   b6:	00001597          	auipc	a1,0x1
   ba:	a3a58593          	addi	a1,a1,-1478 # af0 <malloc+0x15e>
   be:	4509                	li	a0,2
   c0:	7f4000ef          	jal	8b4 <fprintf>
-    close(fd);
   c4:	854a                	mv	a0,s2
   c6:	428000ef          	jal	4ee <close>
-    close(p[0]);
   ca:	fd042503          	lw	a0,-48(s0)
   ce:	420000ef          	jal	4ee <close>
-    close(p[1]);
   d2:	fd442503          	lw	a0,-44(s0)
   d6:	418000ef          	jal	4ee <close>
-    exit(1);
   da:	4505                	li	a0,1
   dc:	3ea000ef          	jal	4c6 <exit>
-    close(p[0]);
-    exit(0);
-  } else {
-    close(p[0]);
   e0:	fd042503          	lw	a0,-48(s0)
   e4:	40a000ef          	jal	4ee <close>
-    while((r = read(fd, &num, sizeof(num))) == sizeof(num)){
   e8:	4611                	li	a2,4
   ea:	fd840593          	addi	a1,s0,-40
   ee:	854a                	mv	a0,s2
   f0:	3ee000ef          	jal	4de <read>
   f4:	4791                	li	a5,4
   f6:	04f51763          	bne	a0,a5,144 <sieve+0x144>
-      if(num % prime != 0){
   fa:	fd842783          	lw	a5,-40(s0)
   fe:	fdc42703          	lw	a4,-36(s0)
  102:	02e7e7bb          	remw	a5,a5,a4
  106:	d3ed                	beqz	a5,e8 <sieve+0xe8>
-        if(write(p[1], &num, sizeof(num)) != sizeof(num)){
  108:	4611                	li	a2,4
  10a:	fd840593          	addi	a1,s0,-40
  10e:	fd442503          	lw	a0,-44(s0)
  112:	3d4000ef          	jal	4e6 <write>
  116:	4791                	li	a5,4
  118:	fcf508e3          	beq	a0,a5,e8 <sieve+0xe8>
-          fprintf(2, "PID %d: write error\n", getpid());
  11c:	42a000ef          	jal	546 <getpid>
  120:	862a                	mv	a2,a0
  122:	00001597          	auipc	a1,0x1
  126:	9e658593          	addi	a1,a1,-1562 # b08 <malloc+0x176>
  12a:	4509                	li	a0,2
  12c:	788000ef          	jal	8b4 <fprintf>
-          close(fd);
  130:	854a                	mv	a0,s2
  132:	3bc000ef          	jal	4ee <close>
-          close(p[1]);
  136:	fd442503          	lw	a0,-44(s0)
  13a:	3b4000ef          	jal	4ee <close>
-          exit(1);
  13e:	4505                	li	a0,1
  140:	386000ef          	jal	4c6 <exit>
-        }
-      }
-    }
-    if(r < 0){
  144:	00054f63          	bltz	a0,162 <sieve+0x162>
-      fprintf(2, "PID %d: read error in loop\n", getpid());
-      close(fd);
-      close(p[1]);
-      exit(1);
-    }
-    close(fd);
  148:	854a                	mv	a0,s2
  14a:	3a4000ef          	jal	4ee <close>
-    close(p[1]);
  14e:	fd442503          	lw	a0,-44(s0)
  152:	39c000ef          	jal	4ee <close>
-    wait(0);
  156:	4501                	li	a0,0
  158:	376000ef          	jal	4ce <wait>
-    exit(0);
  15c:	4501                	li	a0,0
  15e:	368000ef          	jal	4c6 <exit>
-      fprintf(2, "PID %d: read error in loop\n", getpid());
  162:	3e4000ef          	jal	546 <getpid>
  166:	862a                	mv	a2,a0
  168:	00001597          	auipc	a1,0x1
  16c:	9b858593          	addi	a1,a1,-1608 # b20 <malloc+0x18e>
  170:	4509                	li	a0,2
  172:	742000ef          	jal	8b4 <fprintf>
-      close(fd);
  176:	854a                	mv	a0,s2
  178:	376000ef          	jal	4ee <close>
-      close(p[1]);
  17c:	fd442503          	lw	a0,-44(s0)
  180:	36e000ef          	jal	4ee <close>
-      exit(1);
  184:	4505                	li	a0,1
  186:	340000ef          	jal	4c6 <exit>
 
 000000000000018a <main>:
-  }
-}
-
-int main()
-{
  18a:	7179                	addi	sp,sp,-48
  18c:	f406                	sd	ra,40(sp)
  18e:	f022                	sd	s0,32(sp)
  190:	ec26                	sd	s1,24(sp)
  192:	1800                	addi	s0,sp,48
-  int p[2];
-  if(pipe(p) < 0){
  194:	fd840513          	addi	a0,s0,-40
  198:	33e000ef          	jal	4d6 <pipe>
  19c:	00054f63          	bltz	a0,1ba <main+0x30>
-    fprintf(2, "PID %d: pipe() error\n", getpid());
-    exit(1);
-  }
-  int pid = fork();
  1a0:	31e000ef          	jal	4be <fork>
-  if(pid < 0){
  1a4:	02054863          	bltz	a0,1d4 <main+0x4a>
-    fprintf(2, "PID %d: fork() error\n", getpid());
-    exit(1);
-  }
-  if(pid == 0){
  1a8:	e139                	bnez	a0,1ee <main+0x64>
-    close(p[1]);
  1aa:	fdc42503          	lw	a0,-36(s0)
  1ae:	340000ef          	jal	4ee <close>
-    sieve(p[0]);
  1b2:	fd842503          	lw	a0,-40(s0)
  1b6:	e4bff0ef          	jal	0 <sieve>
-    fprintf(2, "PID %d: pipe() error\n", getpid());
  1ba:	38c000ef          	jal	546 <getpid>
  1be:	862a                	mv	a2,a0
  1c0:	00001597          	auipc	a1,0x1
  1c4:	91858593          	addi	a1,a1,-1768 # ad8 <malloc+0x146>
  1c8:	4509                	li	a0,2
  1ca:	6ea000ef          	jal	8b4 <fprintf>
-    exit(1);
  1ce:	4505                	li	a0,1
  1d0:	2f6000ef          	jal	4c6 <exit>
-    fprintf(2, "PID %d: fork() error\n", getpid());
  1d4:	372000ef          	jal	546 <getpid>
  1d8:	862a                	mv	a2,a0
  1da:	00001597          	auipc	a1,0x1
  1de:	91658593          	addi	a1,a1,-1770 # af0 <malloc+0x15e>
  1e2:	4509                	li	a0,2
  1e4:	6d0000ef          	jal	8b4 <fprintf>
-    exit(1);
  1e8:	4505                	li	a0,1
  1ea:	2dc000ef          	jal	4c6 <exit>
-    close(p[0]);
-    exit(0);
-  } else {
-    close(p[0]);
  1ee:	fd842503          	lw	a0,-40(s0)
  1f2:	2fc000ef          	jal	4ee <close>
-    for(int i = 2; i <= 280; i++){
  1f6:	4789                	li	a5,2
  1f8:	fcf42a23          	sw	a5,-44(s0)
  1fc:	11800493          	li	s1,280
-      if(write(p[1], &i, sizeof(i)) != sizeof(i)){
  200:	4611                	li	a2,4
  202:	fd440593          	addi	a1,s0,-44
  206:	fdc42503          	lw	a0,-36(s0)
  20a:	2dc000ef          	jal	4e6 <write>
  20e:	4791                	li	a5,4
  210:	02f51563          	bne	a0,a5,23a <main+0xb0>
-    for(int i = 2; i <= 280; i++){
  214:	fd442783          	lw	a5,-44(s0)
  218:	2785                	addiw	a5,a5,1
  21a:	0007871b          	sext.w	a4,a5
  21e:	fcf42a23          	sw	a5,-44(s0)
  222:	fce4dfe3          	bge	s1,a4,200 <main+0x76>
-        fprintf(2, "PID %d: write error in main\n", getpid());
-        close(p[1]);
-        exit(1);
-      }
-    }
-    close(p[1]);
  226:	fdc42503          	lw	a0,-36(s0)
  22a:	2c4000ef          	jal	4ee <close>
-    wait(0);
  22e:	4501                	li	a0,0
  230:	29e000ef          	jal	4ce <wait>
-    exit(0);
  234:	4501                	li	a0,0
  236:	290000ef          	jal	4c6 <exit>
-        fprintf(2, "PID %d: write error in main\n", getpid());
  23a:	30c000ef          	jal	546 <getpid>
  23e:	862a                	mv	a2,a0
  240:	00001597          	auipc	a1,0x1
  244:	90058593          	addi	a1,a1,-1792 # b40 <malloc+0x1ae>
  248:	4509                	li	a0,2
  24a:	66a000ef          	jal	8b4 <fprintf>
-        close(p[1]);
  24e:	fdc42503          	lw	a0,-36(s0)
  252:	29c000ef          	jal	4ee <close>
-        exit(1);
  256:	4505                	li	a0,1
  258:	26e000ef          	jal	4c6 <exit>
 

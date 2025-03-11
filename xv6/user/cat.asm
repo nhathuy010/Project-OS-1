@@ -5,12 +5,6 @@ user/_cat:     file format elf64-littleriscv
 Disassembly of section .text:
 
 0000000000000000 <cat>:
-
-char buf[512];
-
-void
-cat(int fd)
-{
    0:	7179                	addi	sp,sp,-48
    2:	f406                	sd	ra,40(sp)
    4:	f022                	sd	s0,32(sp)
@@ -19,9 +13,6 @@ cat(int fd)
    a:	e44e                	sd	s3,8(sp)
    c:	1800                	addi	s0,sp,48
    e:	89aa                	mv	s3,a0
-  int n;
-
-  while((n = read(fd, buf, sizeof(buf))) > 0) {
   10:	00001917          	auipc	s2,0x1
   14:	00090913          	mv	s2,s2
   18:	20000613          	li	a2,512
@@ -30,28 +21,18 @@ cat(int fd)
   20:	34c000ef          	jal	36c <read>
   24:	84aa                	mv	s1,a0
   26:	02a05363          	blez	a0,4c <cat+0x4c>
-    if (write(1, buf, n) != n) {
   2a:	8626                	mv	a2,s1
   2c:	85ca                	mv	a1,s2
   2e:	4505                	li	a0,1
   30:	344000ef          	jal	374 <write>
   34:	fe9502e3          	beq	a0,s1,18 <cat+0x18>
-      fprintf(2, "cat: write error\n");
   38:	00001597          	auipc	a1,0x1
   3c:	8e858593          	addi	a1,a1,-1816 # 920 <malloc+0x100>
   40:	4509                	li	a0,2
   42:	700000ef          	jal	742 <fprintf>
-      exit(1);
   46:	4505                	li	a0,1
   48:	30c000ef          	jal	354 <exit>
-    }
-  }
-  if(n < 0){
   4c:	00054963          	bltz	a0,5e <cat+0x5e>
-    fprintf(2, "cat: read error\n");
-    exit(1);
-  }
-}
   50:	70a2                	ld	ra,40(sp)
   52:	7402                	ld	s0,32(sp)
   54:	64e2                	ld	s1,24(sp)
@@ -59,27 +40,18 @@ cat(int fd)
   58:	69a2                	ld	s3,8(sp)
   5a:	6145                	addi	sp,sp,48
   5c:	8082                	ret
-    fprintf(2, "cat: read error\n");
   5e:	00001597          	auipc	a1,0x1
   62:	8da58593          	addi	a1,a1,-1830 # 938 <malloc+0x118>
   66:	4509                	li	a0,2
   68:	6da000ef          	jal	742 <fprintf>
-    exit(1);
   6c:	4505                	li	a0,1
   6e:	2e6000ef          	jal	354 <exit>
 
 0000000000000072 <main>:
-
-int
-main(int argc, char *argv[])
-{
   72:	7179                	addi	sp,sp,-48
   74:	f406                	sd	ra,40(sp)
   76:	f022                	sd	s0,32(sp)
   78:	1800                	addi	s0,sp,48
-  int fd, i;
-
-  if(argc <= 1){
   7a:	4785                	li	a5,1
   7c:	04a7d263          	bge	a5,a0,c0 <main+0x4e>
   80:	ec26                	sd	s1,24(sp)
@@ -91,48 +63,30 @@ main(int argc, char *argv[])
   92:	01d7d993          	srli	s3,a5,0x1d
   96:	05c1                	addi	a1,a1,16
   98:	99ae                	add	s3,s3,a1
-    cat(0);
-    exit(0);
-  }
-
-  for(i = 1; i < argc; i++){
-    if((fd = open(argv[i], O_RDONLY)) < 0){
   9a:	4581                	li	a1,0
   9c:	00093503          	ld	a0,0(s2) # 1010 <buf>
   a0:	2f4000ef          	jal	394 <open>
   a4:	84aa                	mv	s1,a0
   a6:	02054663          	bltz	a0,d2 <main+0x60>
-      fprintf(2, "cat: cannot open %s\n", argv[i]);
-      exit(1);
-    }
-    cat(fd);
   aa:	f57ff0ef          	jal	0 <cat>
-    close(fd);
   ae:	8526                	mv	a0,s1
   b0:	2cc000ef          	jal	37c <close>
-  for(i = 1; i < argc; i++){
   b4:	0921                	addi	s2,s2,8
   b6:	ff3912e3          	bne	s2,s3,9a <main+0x28>
-  }
-  exit(0);
   ba:	4501                	li	a0,0
   bc:	298000ef          	jal	354 <exit>
   c0:	ec26                	sd	s1,24(sp)
   c2:	e84a                	sd	s2,16(sp)
   c4:	e44e                	sd	s3,8(sp)
-    cat(0);
   c6:	4501                	li	a0,0
   c8:	f39ff0ef          	jal	0 <cat>
-    exit(0);
   cc:	4501                	li	a0,0
   ce:	286000ef          	jal	354 <exit>
-      fprintf(2, "cat: cannot open %s\n", argv[i]);
   d2:	00093603          	ld	a2,0(s2)
   d6:	00001597          	auipc	a1,0x1
   da:	87a58593          	addi	a1,a1,-1926 # 950 <malloc+0x130>
   de:	4509                	li	a0,2
   e0:	662000ef          	jal	742 <fprintf>
-      exit(1);
   e4:	4505                	li	a0,1
   e6:	26e000ef          	jal	354 <exit>
 

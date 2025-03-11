@@ -5,152 +5,97 @@ user/_pingpong:     file format elf64-littleriscv
 Disassembly of section .text:
 
 0000000000000000 <main>:
-#include "kernel/types.h"
-#include "kernel/stat.h"
-#include "user/user.h"
-
-int main(){
    0:	7139                	addi	sp,sp,-64
    2:	fc06                	sd	ra,56(sp)
    4:	f822                	sd	s0,48(sp)
    6:	f426                	sd	s1,40(sp)
    8:	0080                	addi	s0,sp,64
-	int p1[2], p2[2];
-
-	if (pipe(p1) < 0 || pipe(p2) < 0){
    a:	fd840513          	addi	a0,s0,-40
    e:	3aa000ef          	jal	3b8 <pipe>
   12:	08054463          	bltz	a0,9a <main+0x9a>
   16:	fd040513          	addi	a0,s0,-48
   1a:	39e000ef          	jal	3b8 <pipe>
   1e:	06054e63          	bltz	a0,9a <main+0x9a>
-		fprintf(2, "Can't create pipe");
-		return 1;
-	}
-
-	int pid = fork();
   22:	37e000ef          	jal	3a0 <fork>
   26:	84aa                	mv	s1,a0
-
-	if (pid < 0){
   28:	08054763          	bltz	a0,b6 <main+0xb6>
-		fprintf(2, "Can't create child process");
-		return 2;
-	}	
-	else if (pid == 0){
   2c:	ed51                	bnez	a0,c8 <main+0xc8>
-		close(p1[1]);
   2e:	fdc42503          	lw	a0,-36(s0)
   32:	39e000ef          	jal	3d0 <close>
-		char received_from_parent[2];
-		read(p1[0], received_from_parent, 2);
   36:	4609                	li	a2,2
   38:	fc040593          	addi	a1,s0,-64
   3c:	fd842503          	lw	a0,-40(s0)
   40:	380000ef          	jal	3c0 <read>
-		close(p1[0]);
   44:	fd842503          	lw	a0,-40(s0)
   48:	388000ef          	jal	3d0 <close>
-		
-		
-		if (strcmp(received_from_parent, "p") == 0){
   4c:	00001597          	auipc	a1,0x1
   50:	95c58593          	addi	a1,a1,-1700 # 9a8 <malloc+0x134>
   54:	fc040513          	addi	a0,s0,-64
   58:	114000ef          	jal	16c <strcmp>
   5c:	e539                	bnez	a0,aa <main+0xaa>
-			int child_pid = getpid();
   5e:	3ca000ef          	jal	428 <getpid>
   62:	862a                	mv	a2,a0
-			fprintf(1, "%d: receive ping\n", child_pid);
   64:	00001597          	auipc	a1,0x1
   68:	94c58593          	addi	a1,a1,-1716 # 9b0 <malloc+0x13c>
   6c:	4505                	li	a0,1
   6e:	728000ef          	jal	796 <fprintf>
-			
-			close(p2[0]);
   72:	fd042503          	lw	a0,-48(s0)
   76:	35a000ef          	jal	3d0 <close>
-			char send_to_parent[2] = "c";
   7a:	06300793          	li	a5,99
   7e:	fcf41423          	sh	a5,-56(s0)
-			write(p2[1], send_to_parent, 1);
   82:	4605                	li	a2,1
   84:	fc840593          	addi	a1,s0,-56
   88:	fd442503          	lw	a0,-44(s0)
   8c:	33c000ef          	jal	3c8 <write>
-			close(p2[1]);
   90:	fd442503          	lw	a0,-44(s0)
   94:	33c000ef          	jal	3d0 <close>
   98:	a809                	j	aa <main+0xaa>
-		fprintf(2, "Can't create pipe");
   9a:	00001597          	auipc	a1,0x1
   9e:	8d658593          	addi	a1,a1,-1834 # 970 <malloc+0xfc>
   a2:	4509                	li	a0,2
   a4:	6f2000ef          	jal	796 <fprintf>
-		return 1;
   a8:	4485                	li	s1,1
-                	fprintf(1, "%d: receive pong\n", parent_pid);
-		}
-		
-	}
-	return 0;
-}
   aa:	8526                	mv	a0,s1
   ac:	70e2                	ld	ra,56(sp)
   ae:	7442                	ld	s0,48(sp)
   b0:	74a2                	ld	s1,40(sp)
   b2:	6121                	addi	sp,sp,64
   b4:	8082                	ret
-		fprintf(2, "Can't create child process");
   b6:	00001597          	auipc	a1,0x1
   ba:	8d258593          	addi	a1,a1,-1838 # 988 <malloc+0x114>
   be:	4509                	li	a0,2
   c0:	6d6000ef          	jal	796 <fprintf>
-		return 2;
   c4:	4489                	li	s1,2
   c6:	b7d5                	j	aa <main+0xaa>
-		close(p1[0]);
   c8:	fd842503          	lw	a0,-40(s0)
   cc:	304000ef          	jal	3d0 <close>
-		char send_to_child[2] = "p";
   d0:	07000793          	li	a5,112
   d4:	fcf41023          	sh	a5,-64(s0)
-		write(p1[1], send_to_child, 1);
   d8:	4605                	li	a2,1
   da:	fc040593          	addi	a1,s0,-64
   de:	fdc42503          	lw	a0,-36(s0)
   e2:	2e6000ef          	jal	3c8 <write>
-		close(p1[1]);
   e6:	fdc42503          	lw	a0,-36(s0)
   ea:	2e6000ef          	jal	3d0 <close>
-		wait(0);
   ee:	4501                	li	a0,0
   f0:	2c0000ef          	jal	3b0 <wait>
-		close(p2[1]);
   f4:	fd442503          	lw	a0,-44(s0)
   f8:	2d8000ef          	jal	3d0 <close>
-		read(p2[0], received_from_child, 1);
   fc:	4605                	li	a2,1
   fe:	fc840593          	addi	a1,s0,-56
  102:	fd042503          	lw	a0,-48(s0)
  106:	2ba000ef          	jal	3c0 <read>
-		close(p2[0]);
  10a:	fd042503          	lw	a0,-48(s0)
  10e:	2c2000ef          	jal	3d0 <close>
-		if (strcmp(received_from_child, "c") == 0){
  112:	00001597          	auipc	a1,0x1
  116:	8b658593          	addi	a1,a1,-1866 # 9c8 <malloc+0x154>
  11a:	fc840513          	addi	a0,s0,-56
  11e:	04e000ef          	jal	16c <strcmp>
  122:	c119                	beqz	a0,128 <main+0x128>
-	return 0;
  124:	4481                	li	s1,0
  126:	b751                	j	aa <main+0xaa>
-                	int parent_pid = getpid();
  128:	300000ef          	jal	428 <getpid>
  12c:	862a                	mv	a2,a0
-                	fprintf(1, "%d: receive pong\n", parent_pid);
  12e:	00001597          	auipc	a1,0x1
  132:	8a258593          	addi	a1,a1,-1886 # 9d0 <malloc+0x15c>
  136:	4505                	li	a0,1
